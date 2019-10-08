@@ -1,3 +1,5 @@
+FROM my/osm-tile-server_cont:latest
+
 ENTRYPOINT ["/run.sh"]
 CMD []
 
