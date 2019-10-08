@@ -1,7 +1,8 @@
 .PHONY: build push test
 
 build:
-	docker build -t overv/openstreetmap-tile-server .
+	docker build -t my/osm-tile-server_base -f Dockerfile_base .
+	docker build -t my/osm-tile-server -f Dockerfile_cont .
 
 push: build
 	docker push overv/openstreetmap-tile-server:latest
