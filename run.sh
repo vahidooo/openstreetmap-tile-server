@@ -35,24 +35,31 @@ if [ "$1" = "import" ]; then
     sudo -u postgres psql -d gis -c "ALTER TABLE spatial_ref_sys OWNER TO renderer;"
     setPostgresPassword
 
-    # Download Luxembourg as sample if no data is provided
-    if [ ! -f /data.osm.pbf ]; then
-        echo "WARNING: No import file at /data.osm.pbf, so importing Luxembourg as example..."
-        wget -nv http://download.geofabrik.de/europe/luxembourg-latest.osm.pbf -O /data.osm.pbf
-        wget -nv http://download.geofabrik.de/europe/luxembourg.poly -O /data.poly
-    fi
+    args=("$@")
+    ELEMENTS=${#args[@]}
+    for (( i=1;i<$ELEMENTS;i++)); do
+        if [ ! -f "/planet/$i-latest.osm.pbf" ]; then
+            echo "LOG: downloading ${args[${i}]} ..."
+            wget -nv "http://download.geofabrik.de/${args[${i}]}-latest.osm.pbf" -O "/planet/${args[${i}]}.osm.pbf"
+         fi
+     done
+
+    echo "LOG: merging all countries osm files and building corresponding poly file"
+    osmium merge /planet/*/*.osm.pbf  -o /planet/planet.osm.pbf
+    osmosis --read-xml file="/planet/planet-latest.osm" --bounding-polygon file="/planet/planet.poly"
+#        wget -nv http://download.geofabrik.de/europe/luxembourg.poly -O /data.poly
 
     # determine and set osmosis_replication_timestamp (for consecutive updates)
-    osmium fileinfo /data.osm.pbf > /var/lib/mod_tile/data.osm.pbf.info
-    osmium fileinfo /data.osm.pbf | grep 'osmosis_replication_timestamp=' | cut -b35-44 > /var/lib/mod_tile/replication_timestamp.txt
+    osmium fileinfo /planet/planet.osm.pbf > /var/lib/mod_tile/data.osm.pbf.info
+    osmium fileinfo /planet/planet.osm.pbf | grep 'osmosis_replication_timestamp=' | cut -b35-44 > /var/lib/mod_tile/replication_timestamp.txt
     REPLICATION_TIMESTAMP=$(cat /var/lib/mod_tile/replication_timestamp.txt)
 
     # initial setup of osmosis workspace (for consecutive updates)
     sudo -u renderer openstreetmap-tiles-update-expire $REPLICATION_TIMESTAMP
 
     # copy polygon file if available
-    if [ -f /data.poly ]; then
-        sudo -u renderer cp /data.poly /var/lib/mod_tile/data.poly
+    if [ -f /planet/planet.poly ]; then
+        sudo -u renderer cp /planet.poly /var/lib/mod_tile/planet/planet.poly
     fi
 
     # Import data
@@ -98,6 +105,19 @@ if [ "$1" = "run" ]; then
 
     exit 0
 fi
+if [ "$1" = "clean-tiles" ]; then
+rm -r /var/lib/mod_tile/ajt/*
+ exit 0
+fi
+if [ "$1" = "append" ]; then
+     echo "LOG: downloading $2 ..."
+     wget -nv "http://download.geofabrik.de/$2-latest.osm.pbf" -O "/planet/$2-latest.osm.pbf"
+     echo "LOG: appending $2 ..."
+     sudo -u renderer osm2pgsql -d gis --append --slim -G --hstore --tag-transform-script /home/renderer/src/openstreetmap-carto/openstreetmap-carto.lua --number-processes ${THREADS:-4} ${OSM2PGSQL_EXTRA_ARGS} -S /home/renderer/src/openstreetmap-carto/openstreetmap-carto.style /planet/$2-latest.osm.pbf
+ exit 0
+fi
+
+
 
 echo "invalid command"
 exit 1
