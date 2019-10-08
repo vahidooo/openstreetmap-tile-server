@@ -37,7 +37,7 @@ if [ "$1" = "import" ]; then
      done
 
     echo "LOG: merging all countries osm files and building corresponding poly file"
-    osmium merge /planet/*/*.osm.pbf  -o /planet/planet.osm.pbf
+    osmium merge --overwrite /planet/*/*.osm.pbf  -o /planet/planet.osm.pbf
 
 #        wget -nv http://download.geofabrik.de/europe/luxembourg.poly -O /data.poly
 
@@ -109,6 +109,34 @@ if [ "$1" = "append" ]; then
      sudo -u renderer osm2pgsql -d gis --append --slim -G --hstore --tag-transform-script /home/renderer/src/openstreetmap-carto/openstreetmap-carto.lua --number-processes ${THREADS:-4} ${OSM2PGSQL_EXTRA_ARGS} -S /home/renderer/src/openstreetmap-carto/openstreetmap-carto.style /planet/$2-latest.osm.pbf
  exit 0
 fi
+
+if [ "$1" = "add-style" ]; then
+     echo "LOG: cloning $2 ..."
+     cd /styles
+     git clone "$3" "$2"
+     echo "LOG: add style to renderd conf $2 ..."
+     sudo echo "[$2]
+                    URI=/$2/
+                    TILEDIR=/var/lib/mod_tile
+                    XML=/styles/$2/mapnik.xml
+                    HOST=localhost
+                    TILESIZE=256
+                    MAXZOOM=20" >> /usr/local/etc/renderd.conf
+
+      carto /styles/$2/project.mml > /styles/$2/mapnik.xml
+
+ exit 0
+fi
+
+if [ "$1" = "reload-style" ]; then
+     echo "LOG: reloading $2 ..."
+     rm -r "/var/lib/mod_tile/$2/*"
+     carto /styles/$2/project.mml > /styles/$2/mapnik.xml
+
+ exit 0
+fi
+
+
 
 
 

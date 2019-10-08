@@ -14,6 +14,7 @@ RUN echo "deb [ allow-insecure=yes ] http://apt.postgresql.org/pub/repos/apt/ bi
   && apt-get update \
   && apt-get install -y apt-transport-https ca-certificates \
   && apt-get install -y --no-install-recommends --allow-unauthenticated \
+  vim \
   python-pip \
   apache2 \
   apache2-dev \
