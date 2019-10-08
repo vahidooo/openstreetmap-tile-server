@@ -29,7 +29,7 @@ if [ "$1" = "import" ]; then
     for (( i=1;i<$ELEMENTS;i++)); do
         if [ ! -f "/planet/${args[${i}]}-latest.osm.pbf" ]; then
             echo "LOG: preparing to download ${args[${i}]} ..."
-		file="/planet/${args[${i}]}.osm.pbf"
+		file="/planet/${args[${i}]}-latest.osm.pbf"
 		mkdir -p "${file%/*}" && touch "$file"
             echo "LOG: downloading ${args[${i}]} ..."
             wget -nv "http://download.geofabrik.de/${args[${i}]}-latest.osm.pbf" -O "/planet/${args[${i}]}-latest.osm.pbf"
