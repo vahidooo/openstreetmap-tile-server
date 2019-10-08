@@ -52,6 +52,7 @@ if [ "$1" = "import" ]; then
     fi
 
     # Import data
+    echo "********************* importing data ... *********************"
     sudo -u renderer osm2pgsql -d gis --create --slim -G --hstore --tag-transform-script /home/renderer/src/openstreetmap-carto/openstreetmap-carto.lua --number-processes ${THREADS:-4} ${OSM2PGSQL_EXTRA_ARGS} -S /home/renderer/src/openstreetmap-carto/openstreetmap-carto.style /planet/planet.osm.pbf
 
     # Create indexes
