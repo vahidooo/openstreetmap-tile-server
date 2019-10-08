@@ -29,6 +29,8 @@ if [ "$1" = "import" ]; then
     for (( i=1;i<$ELEMENTS;i++)); do
         if [ ! -f "/planet/$i-latest.osm.pbf" ]; then
             echo "LOG: downloading ${args[${i}]} ..."
+		file="/planet/${args[${i}]}.osm.pbf"
+		mkdir -p "${file%/*}"
             wget -nv "http://download.geofabrik.de/${args[${i}]}-latest.osm.pbf" -O "/planet/${args[${i}]}.osm.pbf"
          fi
      done
