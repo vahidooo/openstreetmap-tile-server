@@ -1,5 +1,6 @@
 FROM my/osm-tile-server_cont:latest
 
+COPY run.sh /
 ENTRYPOINT ["/run.sh"]
 CMD []
 

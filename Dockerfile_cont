@@ -61,5 +61,4 @@ RUN cd ~/src \
 
 # Start running
 USER root
-COPY run.sh /
 COPY indexes.sql /
