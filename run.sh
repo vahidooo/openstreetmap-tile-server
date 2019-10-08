@@ -48,7 +48,7 @@ if [ "$1" = "import" ]; then
 
     # copy polygon file if available
     if [ -f /planet/planet.poly ]; then
-        sudo -u renderer cp /planet.poly /var/lib/mod_tile/planet/planet.poly
+        sudo -u renderer cp /planet/planet.poly /var/lib/mod_tile/planet/planet.poly
     fi
 
     # Import data
