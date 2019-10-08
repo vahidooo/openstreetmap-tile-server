@@ -38,7 +38,7 @@ if [ "$1" = "import" ]; then
 
     echo "LOG: merging all countries osm files and building corresponding poly file"
     osmium merge /planet/*/*.osm.pbf  -o /planet/planet.osm.pbf
-    osmosis --read-xml file="/planet/planet-latest.osm" --bounding-polygon file="/planet/planet.poly"
+
 #        wget -nv http://download.geofabrik.de/europe/luxembourg.poly -O /data.poly
 
     # determine and set osmosis_replication_timestamp (for consecutive updates)
