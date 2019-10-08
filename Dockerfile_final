@@ -1,0 +1,4 @@
+ENTRYPOINT ["/run.sh"]
+CMD []
+
+EXPOSE 80 5432

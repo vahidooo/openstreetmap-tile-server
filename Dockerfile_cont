@@ -63,7 +63,3 @@ RUN cd ~/src \
 USER root
 COPY run.sh /
 COPY indexes.sql /
-ENTRYPOINT ["/run.sh"]
-CMD []
-
-EXPOSE 80 5432
